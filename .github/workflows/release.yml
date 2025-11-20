@@ -1,4 +1,4 @@
-name: Release Image
+name: Release
 
 on:
     push:
@@ -26,20 +26,15 @@ jobs:
                     python src/text_classification.py
                   "
 
-            - name: Upload trained model artifact
-              uses: actions/upload-artifact@v4
-              with:
-                  name: trained-model
-                  path: output/model.joblib
-
-            - name: Read version
-              id: version
+            - name: Create GitHub Release
+              env:
+                  GH_TOKEN: ${{ github.token }}
               run: |
                   VERSION=v$(yq '.version' config.yaml)
-                  echo "version=$VERSION" >> $GITHUB_OUTPUT
+                  echo "Creating release for version $VERSION"
+                  gh release create "$VERSION" model/model.joblib
 
     build:
-        needs: train
         runs-on: ubuntu-latest
         permissions:
             contents: read
@@ -49,12 +44,6 @@ jobs:
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
-
-            - name: Download trained model
-              uses: actions/download-artifact@v4
-              with:
-                  name: trained-model
-                  path: model/
 
             - name: Log in to the Container Registry
               uses: docker/login-action@v3
@@ -82,15 +71,4 @@ jobs:
                   platforms: linux/amd64,linux/arm64
                   push: true
                   tags: |
-                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.train.outputs.version }}
                       ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-                  build-args: |
-                      MODEL_PATH=model/model.joblib
-
-            - name: Create GitHub Release
-              env:
-                  GH_TOKEN: ${{ github.token }}
-              run: |
-                  VERSION=${{ needs.train.outputs.version }}
-                  echo "Creating release for version $VERSION"
-                  gh release create "$VERSION" model/model.joblib
