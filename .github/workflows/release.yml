@@ -10,8 +10,6 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             contents: write
-        outputs:
-            version: ${{ steps.version.outputs.version }}
         steps:
             - uses: actions/checkout@v4
 
@@ -32,7 +30,7 @@ jobs:
               run: |
                   VERSION=v$(yq '.version' config.yaml)
                   echo "Creating release for version $VERSION"
-                  gh release create "$VERSION" output/model.joblib output/preprocessor.joblib
+                  gh release create $VERSION output/model.joblib output/preprocessor.joblib
 
     build:
         runs-on: ubuntu-latest
@@ -70,5 +68,4 @@ jobs:
                   context: .
                   platforms: linux/amd64,linux/arm64
                   push: true
-                  tags: |
-                      ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+                  tags: ${{ steps.meta.outputs.tags }}
