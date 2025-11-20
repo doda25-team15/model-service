@@ -18,7 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 FROM python:3.12.9-slim AS runtime
 
 WORKDIR /app
-
+ENV PYTHONPATH="/app"
 # Port for model-service
 ENV PORT=8081
 

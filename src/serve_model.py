@@ -4,10 +4,11 @@ Flask API of the SMS Spam detection model model.
 import joblib
 from flask import Flask, jsonify, request
 from flasgger import Swagger
+from startup import load_model
 import pandas as pd
 
 from text_preprocessing import prepare, _extract_message_len, _text_process
-
+MODEL = load_model()
 app = Flask(__name__)
 swagger = Swagger(app)
 
