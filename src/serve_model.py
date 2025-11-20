@@ -8,7 +8,7 @@ from startup import load_model
 import pandas as pd
 
 from text_preprocessing import prepare, _extract_message_len, _text_process
-MODEL = load_model()
+MODEL, PREPROCESSOR = load_model()
 app = Flask(__name__)
 swagger = Swagger(app)
 
@@ -38,8 +38,7 @@ def predict():
     input_data = request.get_json()
     sms = input_data.get('sms')
     processed_sms = prepare(sms)
-    model = joblib.load('output/model.joblib')
-    prediction = model.predict(processed_sms)[0]
+    prediction = MODEL.predict(processed_sms)[0]
     
     res = {
         "result": prediction,
