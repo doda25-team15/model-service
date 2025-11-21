@@ -30,7 +30,7 @@ jobs:
               run: |
                   VERSION=v$(yq '.version' config.yaml)
                   echo "Creating release for version $VERSION"
-                  gh release create $VERSION output/model.joblib
+                  gh release create $VERSION output/model.joblib output/preprocessor.joblib
 
     build:
         runs-on: ubuntu-latest
