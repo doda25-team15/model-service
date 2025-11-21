@@ -37,7 +37,7 @@ def predict():
     """
     input_data = request.get_json()
     sms = input_data.get('sms')
-    processed_sms = prepare(sms)
+    processed_sms = prepare(sms,PREPROCESSOR)
     prediction = MODEL.predict(processed_sms)[0]
     
     res = {
