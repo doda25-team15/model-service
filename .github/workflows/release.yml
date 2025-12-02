@@ -1,39 +1,12 @@
-name: Release
+name: Release Image
 
 on:
     push:
         tags: ["v[0-9]+.[0-9]+.[0-9]+"]
-    workflow_dispatch:
 
 jobs:
-    train:
-        runs-on: ubuntu-latest
-        permissions:
-            contents: write
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: Train model in Docker
-              run: |
-                  docker run --rm -v ${{ github.workspace }}:/root/sms/ python:3.12.9-slim bash -c "
-                    cd /root/sms/ && \
-                    pip install -r requirements.txt && \
-                    mkdir output && \
-                    python src/read_data.py && \
-                    python src/text_preprocessing.py && \
-                    python src/text_classification.py
-                  "
-
-            - name: Create GitHub Release
-              env:
-                  GH_TOKEN: ${{ github.token }}
-              run: |
-                  VERSION=v$(yq '.version' config.yaml)
-                  echo "Creating release for version $VERSION"
-                  gh release create $VERSION output/model.joblib output/preprocessor.joblib
-
-    build:
-        runs-on: ubuntu-latest
+    build-and-push:
+        runs-on: ubuntu-24.04
         permissions:
             contents: read
             packages: write
