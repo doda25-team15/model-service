@@ -12,16 +12,16 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            - name: Train model in Docker
+            - name: Setup Python
+              uses: actions/setup-python@v6
+
+            - name: Train model
               run: |
-                  docker run --rm -v ${{ github.workspace }}:/root/sms/ python:3.12.9-slim bash -c "
-                    cd /root/sms/ && \
-                    pip install -r requirements.txt && \
-                    mkdir output && \
-                    python src/read_data.py && \
-                    python src/text_preprocessing.py && \
-                    python src/text_classification.py
-                  "
+                pip install -r requirements.txt
+                mkdir output
+                python src/read_data.py
+                python src/text_preprocessing.py
+                python src/text_classification.py
 
             - name: Create GitHub Release
               env:
